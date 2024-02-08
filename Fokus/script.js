@@ -7,7 +7,9 @@ const titulo = document.querySelector('.app__title')
 const botoes = document.querySelectorAll('.app__card-button')
 const musicaFocoInput = document.querySelector('#alternar-musica')
 const startPauseBt = document.querySelector('#start-pause')
-const startClick = document.querySelector('.app__card-primary-button')
+const iniciarOuPausaBt = document.querySelector('#start-pause span')
+const mudarIcon = document.querySelector('.app__card-primary-butto-icon')
+const tempoNaTela = document.querySelector('#timer')
 
 const play = new Audio('/Fokus/sons/play.wav')
 const pause = new Audio('/Fokus/sons/pause.mp3')
@@ -15,7 +17,7 @@ const finish = new Audio('/Fokus/sons/beep.mp3')
 const musica = new Audio('/Fokus/sons/luna-rise-part-one.mp3') 
 musica.loop = true
 
-let tempoDecorridoEmSegudos = 5
+let tempoDecorridoEmSegudos = 1500 
 let intervaloId = null
 
 
@@ -29,21 +31,25 @@ musicaFocoInput.addEventListener('change', () =>{
 })
 
 focoBt.addEventListener('click', () =>{
+    tempoDecorridoEmSegudos = 1500
     alteraContexto('foco')
     focoBt.classList.add('active')
 })
 
 curtoBt.addEventListener('click', () => {
+    tempoDecorridoEmSegudos = 300
   alteraContexto('descanso-curto')
   curtoBt.classList.add('active')
 })
 
 longoBt.addEventListener('click', () => {
+    tempoDecorridoEmSegudos = 900
    alteraContexto('descanso-longo')
    longoBt.classList.add('active')
 })
 
 function alteraContexto(contexto){
+    mostrarTempo()
     botoes.forEach(function (contexto) {
         contexto.classList.remove('active')
     });
@@ -75,12 +81,12 @@ function alteraContexto(contexto){
 const contagemRegressiva = () =>{
     if(tempoDecorridoEmSegudos <= 0){
         finish.play()
-        zerar()
         alert('Tempo Finalizado')
+        zerar()
         return
     }
     tempoDecorridoEmSegudos -= 1
-    console.log('Temporizador: ' + tempoDecorridoEmSegudos)
+    mostrarTempo()
 }
 
 startPauseBt.addEventListener('click',iniciarOuPausar)
@@ -93,10 +99,25 @@ function iniciarOuPausar() {
     }
     play.play()
     intervaloId = setInterval(contagemRegressiva, 1000);
+    iniciarOuPausaBt.textContent = "Pausar"
+    mudarIcon.setAttribute('src', `/Fokus/imagens/pause.png`)
+   
 
 }
 
 function zerar(){
     clearInterval(intervaloId)
+    iniciarOuPausaBt.textContent = "Começar"
+    mudarIcon.setAttribute('src', `/Fokus/imagens/play_arrow.png`)
     intervaloId = null
 }
+
+function mostrarTempo(){
+    const tempo = new Date(tempoDecorridoEmSegudos * 1000)
+    const tempoFormatado = tempo.toLocaleTimeString('pt-br', {minute: '2-digit', second: '2-digit'})
+    tempoNaTela.innerHTML = `${tempoFormatado}`
+
+
+}
+
+mostrarTempo()
